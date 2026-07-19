@@ -2,7 +2,7 @@
 
 # 🚀 1단계: Kubernetes 핵심 인프라 (Rocky Linux) 기본 구축
 
-본 문서는 Rocky Linux 9 기반의 베이스 VM 생성부터 Kubernetes Control-plane 및 Worker 노드 구성, 그리고 CNI(Calico) 설치까지의 과정을 기록합니다. 단순한 패키지 설치를 넘어, K8s의 아키텍처 철학에 맞춘 리눅스 커널 튜닝 및 네트워크 격리(CIDR)의 기술적 근거를 포함합니다.
+본 문서는 Rocky Linux 9 기반의 베이스 VM 생성부터 Kubernetes Control-plane 및 Worker 노드 구성, 그리고 CNI(Calico) 설치까지의 과정을 기록합니다. 
 
 ---
 
@@ -12,7 +12,7 @@
 
 * **CPU:** 2~4 Core
 * **RAM:** 4GB 이상
-* **Disk:** 40GB
+* **Disk:** 30GB
 * **네트워크:** 관리망 대역 (172.16.0.0/24)
 
 ### 1-2. 패키지 업데이트 및 시간 동기화
@@ -34,7 +34,7 @@ chronyc tracking
 
 ## 2. K8s 구동을 위한 커널 및 OS 튜닝 (핵심)
 
-단순한 리눅스 서버가 아닌, 패킷을 직접 라우팅하고 제어하는 "가상의 네트워크 인프라"로 동작시키기 위한 필수 커널 튜닝 과정입니다.
+패킷을 직접 라우팅하고 제어하는 "가상의 네트워크 인프라"로 동작시키기 위한 필수 커널 튜닝 과정입니다.
 
 ### 2-1. Swap 비활성화
 
@@ -70,9 +70,8 @@ modprobe br_netfilter
 * **동작 원리:** 여러 개의 디렉토리를 수직으로 쌓아 단일 파일시스템처럼 마운트하는 기술입니다.
 * **Lowerdir (읽기 전용):** 컨테이너의 베이스 이미지 공간입니다. 노드에 생성되는 수십 개의 파드가 하나의 Lowerdir을 공유하여 디스크 공간을 절약합니다.
 * **Upperdir (쓰기 가능):** 개별 파드에 할당되는 고유의 빈 공간입니다.
-
-
 * **CoW (Copy-on-Write) 매커니즘:** 파드가 데이터를 읽을 때는 공유된 Lowerdir을 바로 읽습니다. 기존 파일의 수정이 발생할 때만, 해당 파일을 Upperdir로 복사(Copy)한 뒤 수정(Write)합니다. 이를 통해 파드 생성 시 복사 작업을 생략하고, 즉각적인 구동(밀리초 단위)을 가능하게 합니다.
+<img width="1280" height="874" alt="Image" src="https://github.com/user-attachments/assets/698a5639-1c74-464a-8dd1-d9a62effbe89" />
 
 #### 2) `br_netfilter` (브리지 네트워크 필터링)
 
