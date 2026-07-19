@@ -129,13 +129,48 @@ sysctl --system
 
 베이스 VM 종료 후 Master 1대, Worker 2대로 복제합니다.
 
-* **명령어:** `hostnamectl set-hostname [이름]`
-* **/etc/hosts 맵핑:** K8s 내부 컴포넌트들이 IP가 아닌 도메인 이름으로 서로를 찾을 수 있도록 3대의 IP와 호스트네임을 모두 등록합니다. (예: 172.16.0.10 k8s-master)
+* **호스트네임 변경:** `hostnamectl set-hostname [이름]`
+* **DNS 맵핑 (`/etc/hosts`):** K8s 내부 컴포넌트가 IP가 아닌 도메인 이름으로 통신할 수 있도록 3대의 IP와 호스트네임을 등록합니다. (예: `172.16.0.10 k8s-master`)
 
-### 4-2. Master 노드 초기화 (네트워크 대역 분리)
+### 4-2. K8s 전용 관리자 계정(`k8sadmin`) 생성 (모든 노드 공통)
 
-* **명령어:** `kubeadm init --pod-network-cidr=172.20.0.0/16`
-* **이유:** 홈랩의 관리망(VM IP) 대역이 `172.16.0.0/24`입니다. Calico의 기본 설정인 `192.168.0.0/16`을 그대로 쓰거나 관리망과 겹치게(Overlap) 설정하면 패킷이 길을 잃는 라우팅 충돌(Split-Brain)이 발생합니다. 따라서 파드 전용 네트워크를 `172.20.0.0/16`으로 완전히 격리하여 충돌 장애점을 사전 제거합니다.
+* **명령어:**
+
+```bash
+useradd k8sadmin
+passwd k8sadmin
+echo "k8sadmin ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/k8sadmin
+
+```
+
+* **적용 이유:** `root` 계정의 직접 사용을 차단하고 운영 권한을 분리하기 위함입니다. K8s 관리는 별도의 전용 계정(`k8sadmin`)으로 수행하며, 필요한 경우에만 `sudo` 권한을 호출하도록 구성합니다. (베이스 VM 생성 단계에서 미리 적용해 두면 복제 시 편리합니다.)
+
+### 4-3. Master 노드 초기화 (네트워크 대역 분리)
+
+* **명령어:**
+
+```bash
+sudo kubeadm init --pod-network-cidr=172.20.0.0/16
+
+```
+
+* **적용 이유:** 홈랩의 관리망(VM IP) 대역이 `172.16.0.0/24`입니다. Calico의 기본 설정인 `192.168.0.0/16`을 그대로 쓰거나 관리망과 겹치게(Overlap) 설정하면 패킷이 길을 잃는 라우팅 충돌(Split-Brain)이 발생합니다. 따라서 파드 전용 네트워크를 `172.20.0.0/16`으로 완전히 격리하여 충돌 장애점을 사전 제거합니다.
+
+### 4-4. Kubeconfig 파일 소유권 부여 (Master 노드)
+
+`kubeadm init` 완료 직후, `k8sadmin` 계정에서 `kubectl` 명령어를 사용할 수 있도록 인증 파일을 복사합니다.
+
+* **명령어:** (`k8sadmin` 계정으로 접속한 상태에서 실행)
+
+```bash
+mkdir -p $HOME/.kube
+sudo cp -i /etc/kubernetes/admin.conf $HOME/.kube/config
+sudo chown $(id -u):$(id -g) $HOME/.kube/config
+
+```
+
+* **적용 이유:** K8s API 서버와 통신하려면 `/etc/kubernetes/admin.conf` 인증서 파일이 필요합니다. 기본적으로 `root` 소유인 이 파일을 `k8sadmin`의 홈 디렉토리로 복사하고 소유권을 넘겨주어, 이후 모든 클러스터 제어를 `k8sadmin` 계정으로 수행할 수 있게 합니다.
+
 
 ---
 
