@@ -35,6 +35,26 @@ vSphere 환경에서 Kubernetes 클러스터를 구축하고, OpenStack 기반 �
 
 </details>
 
+<details>
+
+<summary><strong> CNI (Cilium) 기본 설정 차이 및 iptables와 IPVS 차이</strong></summary>
+
+</details>
+
+
+<details>
+
+<summary><strong> 쿠버네티스 네트워크 흐름 with OS</strong></summary>
+
+</details>
+
+<details>
+
+<summary><strong> 쿠버네티스 자원 with OS</strong></summary>
+
+</details>
+
+
 ## 🛠️ Directory Structure
 - **`cni/`** : K8s 데이터플레인 네트워크 매니페스트 (Calico, Cilium)
 - **`apps/`** : 클러스터 배포용 애플리케이션 리소스 (ArgoCD, Harbor 등 자동화 타겟)
