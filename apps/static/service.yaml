@@ -1,0 +1,13 @@
+apiVersion: v1 # v1
+kind: Service # Service
+
+metadata:
+  name: static-service
+
+spec:
+  selector:
+    app: static
+
+  ports:
+    - port: 80
+      targetPort: 80
