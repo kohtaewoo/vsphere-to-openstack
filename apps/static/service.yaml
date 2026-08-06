@@ -3,6 +3,7 @@ kind: Service # Service
 
 metadata:
   name: static-service
+  namespace: static-system
 
 spec:
   selector:

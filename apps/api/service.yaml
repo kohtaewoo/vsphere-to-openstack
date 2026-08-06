@@ -3,6 +3,7 @@ kind: Service # Service
 
 metadata:
   name: api-service
+  namespace: api-system
 
 spec:
   selector:

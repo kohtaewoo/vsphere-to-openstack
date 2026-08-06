@@ -3,6 +3,7 @@ kind: Deployment
 
 metadata:
   name: example-deployment
+  namespace: example-system
 
 spec:
   replicas: 3

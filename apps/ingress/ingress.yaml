@@ -3,6 +3,7 @@ kind: Ingress # Ingress
 
 metadata:
   name: example-ingress
+  namespace: ingress-system
 
 spec:
   rules:

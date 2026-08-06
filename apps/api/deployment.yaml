@@ -3,6 +3,7 @@ kind: Deployment
 
 metadata:
   name: api-deployment
+  namespace: api-system
 
 spec:
   replicas: 3

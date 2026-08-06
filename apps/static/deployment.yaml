@@ -3,6 +3,7 @@ kind: Deployment
 
 metadata:
   name: static-deployment
+  namespace: static-system
 
 spec:
   replicas: 3
