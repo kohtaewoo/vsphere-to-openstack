@@ -37,3 +37,12 @@ apiVersion: operator.tigera.io/v1
 kind: Whisker
 metadata:
   name: default
+
+---
+# Enables Prometheus metrics for Calico Felix.
+apiVersion: projectcalico.org/v3
+kind: FelixConfiguration
+metadata:
+  name: default
+spec:
+  prometheusMetricsEnabled: true
