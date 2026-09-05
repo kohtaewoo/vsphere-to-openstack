@@ -24,6 +24,14 @@ prometheus:
         cpu: 500m
         memory: 1Gi
 
+    additionalScrapeConfigs:
+      - job_name: calico-felix
+        static_configs:
+          - targets:
+              - 172.16.2.11:9091
+              - 172.16.2.101:9091
+              - 172.16.2.102:9091
+
     storageSpec:
       volumeClaimTemplate:
         spec:
